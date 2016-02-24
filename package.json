@@ -1,0 +1,33 @@
+{
+  "name": "node-registry-express",
+  "description": "Express Server plugin for Node Registry library",
+  "homepage": "http://vladaspasic.github.io/node-registry-express",
+  "version": "0.0.1",
+  "directories": {
+    "test": "tests"
+  },
+   "repository": {
+    "type": "git",
+    "url": "git://github.com/vladaspasic/node-registry-express.git"
+  },
+  "scripts": {
+    "test": "echo 'no tests atm'"
+  },
+  "engines": {
+    "node": ">= 4.0.0"
+  },
+  "license": "MIT",
+  "keywords": [
+    "express",
+    "node-registry-express",
+    "node-registry-plugin"
+  ],
+  "author": "Vladimir Spasic <vladimir.spasic.86@gmail.com>",
+  "dependencies": {
+    "consolidate": "^0.13.1",
+    "debug": "^2.2.0",
+    "error-globals": "0.0.2",
+    "express": "^4.12.4",
+    "serve-favicon": "^2.3.0"
+  }
+}
