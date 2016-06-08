@@ -6,7 +6,7 @@
   "directories": {
     "test": "tests"
   },
-   "repository": {
+  "repository": {
     "type": "git",
     "url": "git://github.com/vladaspasic/node-registry-express.git"
   },
@@ -28,6 +28,7 @@
     "debug": "^2.2.0",
     "error-globals": "0.0.2",
     "express": "^4.12.4",
+    "methods": "^1.1.2",
     "serve-favicon": "^2.3.0"
   }
 }
