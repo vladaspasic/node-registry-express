@@ -9,59 +9,128 @@ npm install node-registy-express --save
 ```
 ### Routing
 
-To define routes for your `express` server, you need to place all your route files in your `routes` folder. You can change the folder where your are located by changing the `server.routes.location` environment property.
+In order to define your routes you need to have a `routes/index.js`. You can change this location by setting the `server.routes.location` environment property in your configuration files.
 
-A simple route file should look like this:
+A simple router file should look like this:
 
+`routes/index.js`
 ``` javascript
-module.exports = function(route, filters) {
+module.exports = function() {
 
-	route.get('/', function(req, res) {
+	this.get('/', (req, res) => {
 		return res.render('index');
 	});
 	
-	route.get('/profile', filters.auth, function(req, res) {
-		return res.render('profile', {
-		    name: 'John Doe'
+	this.get('/profile', (req, res, next) => {
+		if(req.user) {
+			return next();
+		}
+
+		throw new Error('Unauthorized access');
+	}, (req, res) => {
+		return res.render('profile', req.user);
+	});
+
+	// Loads a router file from the `api` folder that
+	// is mounted on the current router with an `/api` path
+	this.route('api');
+
+	// Creates a new Router that is mounted with a `/blog` path
+	this.route('blog', function() {
+		// Renders the index page of the blog
+		this.get('/', (req, res) => {
+			return res.render('blog/index', {
+				layout: 'blog'
+			});
 		});
 	});
 
-	route.get('/error', function(req, res) {
-		throw new Error('Ooops');
+	this.use((error, req, res, next) => {
+		return res.render('error', error);
 	});
 
 };
 ```
 
-This route would handle `http://example.com`, `http://example.com/profile` and `http://example.com/error` URLS.
-
-Your file must export a function that accepts a `Route` instance that later mounted on the express application and a `filters` object which contains all the available filters that you can use as middleware. 
-
-You can also create subfolders in your `routes` folder where the folder name would be your route mount path on the Express router. If you have an `api` subfolder in your `routes` folder, all routes would be accessible with `api/` prefix.
-
-This is applied recursively to all your folders.
-
-### Filters (Middlewares)
-
-To create filters for your `express` server, you need to place all your files in your `filters` folder. You can change the folder where your are located by changing the `server.filters.location` environment property.
-
-All files should export a function which is a middleware function.
-
-This is a `auth.js` file, which creates an `auth` filter used in the Routes example.
-
+`routes/api/index.js`
 ``` javascript
-module.exports = function (req, res, next) {
-    if(req.user) {
-	    next();
-    } else {
-        next(new Error('Unauthorized request.'));
-    }
+module.exports = function() {
+
+	// Mount a new router instance to `api/users` path
+	this.route('users', function() {
+		this.get('/', (req, res, next) => {
+			// list users
+		});
+
+		this.get('/:id', (req, res, next) => {
+			// find user
+		});
+
+		this.post('/', (req, res, next) => {
+			// create user
+		});
+
+		this.put('/:id', (req, res, next) => {
+			// update user
+		});
+
+		this.delete('/:id', (req, res, next) => {
+			// delete user
+		});
+	});
+
+	// Mounts a `posts` Router from `api/posts/index.js` file
+	// to the `api` router with `/api/posts/` mount path
+	this.route('posts');
+
+	// this router would use this error handler
+	this.use((error, req, res, next) => {
+		return res.json(error);
+	});
+
+};
+```
+
+`routes/api/posts/index.js`
+``` javascript
+module.exports = function() {
+
+	this.get('/', (req, res, next) => {
+		// list posts
+	});
+
+	this.get('/:id', (req, res, next) => {
+		// find post
+	});
+
+	this.post('/', (req, res, next) => {
+		// create post
+	});
+
+	this.put('/:id', (req, res, next) => {
+		// update post
+	});
+
+	this.delete('/:id', (req, res, next) => {
+		// delete post
+	});
+
 };
 ```
 
 ### Configuration
 
-This plugin comes with standard express midlewares that could be configured in your projects `config` file. Here is the list of middlewares that are configured, represented in the order how they are applied.
+You can directly configure your `express` server by setting the following options in your project configuration:
+
+###### Options
+* `server.port` - Set the `express` server port
+* `server.options.proxy` - Sets the `express` `trust proxy` option, defaults to `false`
+* `server.options.etag` - Sets the `express` `etag` option, defaults to `weak`
+* `server.options.jsonp-callback` - Sets the `express` `jsonp callback name` option, defaults to `callback`
+* `server.options.query-parser` - Sets the `express` `query parser` option, defaults to `extended`
+* `server.options.strict-routing` - Sets the `express` `strict routing` option, defaults to `false`
+
+This plugin also comes with standard express midlewares that could be configured in your projects `configuration` files. Here is the list of middlewares that are configured, represented in the order how they are applied.
 
 #### Compression
 Uses Express `compression` middleware to enable compression of the Response Stream.
